@@ -93,9 +93,9 @@ wget -q --show-progress --no-use-server-timestamps https://github.com/raspberryp
 
 wget -q --show-progress --no-use-server-timestamps https://github.com/raspberrypi/firmware/raw/master/hardfp/opt/vc/lib/libEGL.so
 
-wget -q --show-progress --no-use-server-timestamps https://github.com/raspberrypi/firmware/raw/master/hardfp/opt/vc/lib/pkgconfig/glesv2.pc
+wget -q --show-progress --no-use-server-timestamps https://github.com/raspberrypi/firmware/raw/master/hardfp/opt/vc/lib/pkgconfig/brcmglesv2.pc
 
-wget -q --show-progress --no-use-server-timestamps https://github.com/raspberrypi/firmware/raw/master/hardfp/opt/vc/lib/pkgconfig/egl.pc
+wget -q --show-progress --no-use-server-timestamps https://github.com/raspberrypi/firmware/raw/master/hardfp/opt/vc/lib/pkgconfig/brcmegl.pc
 
 wget -q --show-progress --no-use-server-timestamps https://waf.io/waf-2.0.9
 
@@ -111,9 +111,9 @@ sudo cp libGLESv2.so /opt/vc/lib
 
 sudo cp libEGL.so /opt/vc/lib
 
-sudo cp glesv2.pc /opt/vc/lib/pkgconfig
+sudo cp brcmglesv2.pc /opt/vc/lib/pkgconfig
 
-sudo cp egl.pc /opt/vc/lib/pkgconfig
+sudo cp brcmegl.pc /opt/vc/lib/pkgconfig
 
 
 
@@ -435,7 +435,7 @@ export CPATH=/opt/vc/include
 ##### This next section is fairly straightforward. This is where we build and install mpv! The only noteworthy point is that instead of using the "make" system to do our building like all the other programs in this script, we're using the "waf" system. That simply reflects the preferences of the mpv developers.
 
 
-./waf configure --prefix=/usr --enable-rpi --enable-cdda --enable-dvdread --enable-dvdnav --enable-libbluray --libmpv-shared
+./waf configure --prefix=/usr --enable-rpi --enable-cdda --enable-dvdread --enable-dvdnav --enable-libbluray --enable-libmpv-shared
 
 echo; echo; echo
 echo "------------------------------"
