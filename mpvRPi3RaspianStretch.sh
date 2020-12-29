@@ -321,7 +321,7 @@ cd /home/pi/Vidware_Build/ffmpeg
 --prefix=/usr \
 --enable-gpl \
 --enable-nonfree \
---enable-static \
+--enable-shared \
 --enable-libtheora \
 --enable-libvorbis \
 --enable-omx \
@@ -435,7 +435,7 @@ export CPATH=/opt/vc/include
 ##### This next section is fairly straightforward. This is where we build and install mpv! The only noteworthy point is that instead of using the "make" system to do our building like all the other programs in this script, we're using the "waf" system. That simply reflects the preferences of the mpv developers.
 
 
-./waf configure --prefix=/usr --enable-rpi --enable-cdda --enable-dvdread --enable-dvdnav --enable-libbluray
+./waf configure --prefix=/usr --enable-rpi --enable-cdda --enable-dvdread --enable-dvdnav --enable-libbluray --libmpv-shared
 
 echo; echo; echo
 echo "------------------------------"
