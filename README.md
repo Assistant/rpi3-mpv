@@ -1,2 +1,2 @@
-# rpi3-mpv
- build script for ffmpeg+mpv for the RPi3 on Raspian Stretch by RPi_Mike
+# All credit to [RPi_Mike](https://www.raspberrypi.org/forums/viewtopic.php?t=199775) + [bemused](https://www.raspberrypi.org/forums/viewtopic.php?f=38&t=199775&start=100#p1369012) for libmpv tweak
+Just hosting it here for convenience
