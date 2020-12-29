@@ -5,7 +5,7 @@
 ##### Vidware_Downloads: My script philosophy is to keep things clean and simple. That's why my first step is to create 3 different folders to keep the main elements of my script completely separate from each other. Before anything can be built, we first have to download 6 files in the form of "stable release tarballs". This is the raw source code my script will use to build the 6 programs. We also need 4 GPU-related files from the Raspberry Pi Foundation's official GitHub site that provide OpenGL ES and EGL support (they allow mpv to "talk" to the Raspberry's VideoCore GPU and thus facilitate hardware acceleration). Finally, we need a "waf" file that will allow us to build mpv. All of this will go inside the "Vidware_Downloads" folder – which we're creating with the mkdir command:
 
 
-mkdir Vidware_Downloads
+mkdir -p ~/.local/var/Vidware_Downloads
 
 
 
@@ -15,7 +15,7 @@ mkdir Vidware_Downloads
 ##### Vidware_Build: This is the folder where all our "building" will take place – the folder where the raw source code of 6 programs will be compiled and transformed into working software. The "primary" programs are FFmpeg and mpv. But my script also builds a mandatory library called libass – a subtitle renderer that mpv requires. It also builds an advanced H.264 video encoder (x264) and two advanced audio encoders (Fraunhofer AAC and LAME MP3):
 
 
-mkdir Vidware_Build
+mkdir -p ~/.local/src/Vidware_Build
 
 
 
@@ -25,7 +25,7 @@ mkdir Vidware_Build
 ##### Vidware_Packages: This folder will remain empty until the very end of the script. When the script is about 95% complete, all 6 programs will be fully built, installed, and "packaged". These packages are free-standing Debian installers (commonly known as .deb files). What makes these so incredibly useful is that at any time, you can use them to automatically install (or re-install) all the programs on another Raspberry or your existing Raspberry in the future – IN ONLY ONE MINUTE! No scripts or "building" required! My script will conveniently place all of them in the Vidware_Packages folder – so be sure to back them up to a safe place!
 
 
-mkdir Vidware_Packages
+mkdir -p ~/.local/opt/Vidware_Packages
 
 
 
@@ -67,7 +67,7 @@ echo
 ##### We're about to download all the files that the script needs. It may look like a lot, but the grand total is less than 18 MB! This is quite impressive when you consider that FFmpeg alone contains more than one MILLION lines of source code! Before we do the downloads, however, we need to change our current working directory to the Vidware_Downloads folder with the cd command:
 
 
-cd /home/pi/Vidware_Downloads
+cd ~/.local/var/Vidware_Downloads
 
 
 
@@ -134,9 +134,9 @@ chmod u+x waf
 ##### This makes an exact copy of our 6 source code tarballs (for FFmpeg, mpv, etc.) and places them inside the Vidware_Build folder. Some of the tarballs end in tar.gz, while others end in tar.bz2 – hence the 2 separate lines:
 
 
-cp *.gz /home/pi/Vidware_Build
+cp *.gz ~/.local/src/Vidware_Build
 
-cp *.bz2 /home/pi/Vidware_Build
+cp *.bz2 ~/.local/src/Vidware_Build
 
 
 
@@ -147,7 +147,7 @@ cp *.bz2 /home/pi/Vidware_Build
 ##### We're pretty much all done with the Vidware_Downloads folder at this point – so we now need to make sure the script is performing its actions inside the Vidware_Build folder. That's why we cd into it. We then need to "unzip" the 6 source code tarballs into folders – that's what the 2 "ls" lines with the xargs command does (for technical reasons, you can't use a simple asterisk wildcard to unzip multiple tarballs in the same folder). Finally, I delete all the tarballs in the build folder with the rm command. Why? Because we already have the original copy of them in our Vidware_Downloads folder – so there's no reason to clutter things up with duplicate tarballs!
 
 
-cd /home/pi/Vidware_Build
+cd ~/.local/src/Vidware_Build
 
 ls *.gz | xargs -n1 tar xzf
 
@@ -185,7 +185,7 @@ mv libass* libass
 ##### We can now copy over the waf file into the mpv source code folder:
 
 
-cp /home/pi/Vidware_Downloads/waf /home/pi/Vidware_Build/mpv
+cp ~/.local/var/Vidware_Downloads/waf ~/.local/src/Vidware_Build/mpv
 
 
 
@@ -217,7 +217,7 @@ echo "Now building the x264 video encoder. This will take about 2 to 3 minutes."
 echo "------------------------------"
 echo
 
-cd /home/pi/Vidware_Build/x264
+cd ~/.local/src/Vidware_Build/x264
 
 ./configure --prefix=/usr --enable-shared --disable-opencl --extra-cflags="-march=armv8-a+crc -mfpu=neon-fp-armv8 -mtune=cortex-a53"
 
@@ -241,7 +241,7 @@ echo "Now building the Fraunhofer AAC audio encoder. This will take about 3 to 4
 echo "------------------------------"
 echo
 
-cd /home/pi/Vidware_Build/aac
+cd ~/.local/src/Vidware_Build/aac
 
 ./autogen.sh
 
@@ -267,7 +267,7 @@ echo "Now building the LAME MP3 audio encoder. This will take about 1 minute." |
 echo "------------------------------"
 echo
 
-cd /home/pi/Vidware_Build/mp3
+cd ~/.local/src/Vidware_Build/mp3
 
 ./configure --prefix=/usr --enable-shared
 
@@ -291,7 +291,7 @@ echo "Now building the libass subtitle renderer. This will take about 1 minute."
 echo "------------------------------"
 echo
 
-cd /home/pi/Vidware_Build/libass
+cd ~/.local/src/Vidware_Build/libass
 
 ./configure --prefix=/usr --enable-shared
 
@@ -315,7 +315,7 @@ echo "Now preparing to build FFmpeg. This will take about 2 minutes." | fold -s
 echo "------------------------------"
 echo
 
-cd /home/pi/Vidware_Build/ffmpeg
+cd ~/.local/src/Vidware_Build/ffmpeg
 
 ./configure \
 --prefix=/usr \
@@ -371,7 +371,7 @@ echo "Now preparing to build mpv. This will take about 1 minute." | fold -s
 echo "------------------------------"
 echo
 
-cd /home/pi/Vidware_Build/mpv
+cd ~/.local/src/Vidware_Build/mpv
 
 
 
@@ -381,9 +381,9 @@ cd /home/pi/Vidware_Build/mpv
 ##### In this section, I'm using the sed command to manipulate mpv's raw source code before we build it. The first edit specifically targets line 767 of mpv's wscript file. The wscript file contains the "building instructions" for mpv. There are more than 1,100 lines of code in the file, but only 18 of them are directly related to the Raspberry. The line I'm editing makes reference to a generic OpenGL ES "linkflag". With the sed command, I'm doing a "search & replace" so that it will now make reference to the Broadcom-specific version of the linkflag (Broadcom is the manufacturer of the Raspberry's VideoCore GPU). Beginning with the next line, I delete an entire stanza (13 lines) of audio-related source code and then replace it with 20 lines of modified and expanded code. Specifically, it affects how mpv interacts with the ALSA framework. Without this change, mpv would throw various audio-related "[ao/alsa]" errors. Hat tip: My ALSA source code patch combines the ideas of mpv contributor "orbea" and user "yumkam" on mpv's official GitHub site. And then we have the final sed line – it serves absolutely no purpose other than to give a bit of credit to yours truly!
 
 
-sed -i_BACKUP '767s|GLESv2|brcmGLESv2|g' /home/pi/Vidware_Build/mpv/wscript
+sed -i_BACKUP '767s|GLESv2|brcmGLESv2|g' ~/.local/src/Vidware_Build/mpv/wscript
 
-sed -i_BACKUP '939,951d' /home/pi/Vidware_Build/mpv/audio/out/ao_alsa.c
+sed -i_BACKUP '939,951d' ~/.local/src/Vidware_Build/mpv/audio/out/ao_alsa.c
 
 sed -i '939i\
 \
@@ -409,9 +409,9 @@ space, snd_strerror(space));\
 // request a reload of the AO if device is not present,\
 // then error out.\
 \
-' /home/pi/Vidware_Build/mpv/audio/out/ao_alsa.c
+' ~/.local/src/Vidware_Build/mpv/audio/out/ao_alsa.c
 
-sed -i_BACKUP '143s|built on|built by the RPi_Mike script on|g' /home/pi/Vidware_Build/mpv/player/main.c
+sed -i_BACKUP '143s|built on|built by the RPi_Mike script on|g' ~/.local/src/Vidware_Build/mpv/player/main.c
 
 
 
@@ -578,7 +578,7 @@ echo "Almost finished! The Debian package files are now in the Vidware_Packages 
 echo "------------------------------"
 echo
 
-find /home/pi/Vidware_Build -name '*.deb' -exec mv -t /home/pi/Vidware_Packages {} +
+find ~/.local/src/Vidware_Build -name '*.deb' -exec mv -t ~/.local/opt/Vidware_Packages {} +
 
 
 
